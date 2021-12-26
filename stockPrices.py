@@ -17,17 +17,20 @@ def getStockPrice(ticker):
 /v2/aggs/ticker/{ticker}/range/1/day/\
 {start}/{end}?adjusted=true&sort=desc&limit={limit}&apiKey=fPcPy4ipOKuWrH9iGBPB8GwJA23WqNdw'
 
-    res = requests.get(url)
-    res = res.json()
-    res = res['results']
+    try:
+        res = requests.get(url)
+        res = res.json()
+        res = res['results']
+        header = ["Volume", "Open", "Close", "High", "Low", "Transactions"]
 
-    header = ["Volume", "Open", "Close", "High", "Low", "Transactions"]
+        with open(f"data/{ticker}.csv", 'w') as file:
+            file = csv.writer(file)
+            file.writerow(header)
+            for day in res:
+                file.writerow([day['v'], day['o'], day['c'], day['h'], day['l'], day['n']])
+    except:
+        print("Error Grabbing {}".format(ticker))
 
-    with open(f"data/{ticker}.csv", 'w') as file:
-        file = csv.writer(file)
-        file.writerow(header)
-        for day in res:
-            file.writerow([day['v'], day['o'], day['c'], day['h'], day['l'], day['n']])
     return
 
 # if __name__ == '__main__':
@@ -37,6 +40,7 @@ def getStockPrice(ticker):
 
 tickers = getTickers()
 i = 0
+
 for ticker in tickers:
     t = threading.Thread(target=getStockPrice, args=((ticker,)))
     t.start()
@@ -45,4 +49,4 @@ for ticker in tickers:
         print('sleeping..')
         time.sleep(61)
         i=0
-        
+
