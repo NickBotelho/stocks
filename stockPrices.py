@@ -3,7 +3,9 @@ import requests
 import time
 import csv
 import multiprocessing
-tickers = ['F', "GE", "AAPL"]
+import threading
+from tickers import getTickers
+# tickers = ['F', "GE", "AAPL"]
 
 def getStockPrice(ticker):
     print("Getting {}...".format(ticker))
@@ -21,14 +23,26 @@ def getStockPrice(ticker):
 
     header = ["Volume", "Open", "Close", "High", "Low", "Transactions"]
 
-    with open(f"{ticker}.csv", 'w') as file:
+    with open(f"data/{ticker}.csv", 'w') as file:
         file = csv.writer(file)
         file.writerow(header)
         for day in res:
             file.writerow([day['v'], day['o'], day['c'], day['h'], day['l'], day['n']])
     return
 
-if __name__ == '__main__':
-    with multiprocessing.Pool(5) as p:
-        p.map(getStockPrice, tickers)
+# if __name__ == '__main__':
+#     tickers = getTickers()
+#     with multiprocessing.Pool(5) as p:
+#         p.map(getStockPrice, tickers[:200])
 
+tickers = getTickers()
+i = 0
+for ticker in tickers:
+    t = threading.Thread(target=getStockPrice, args=((ticker,)))
+    t.start()
+    i+=1
+    if i % 5 == 0:
+        print('sleeping..')
+        time.sleep(61)
+        i=0
+        

@@ -1,7 +1,13 @@
-# import get_all_tickers
-# from get_all_tickers import get_tickers
-from get_all_tickers import get_tickers as gt
-# import get_all_tickers
+tickers_url = 'http://ftp.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt'
+def getTickers():
+    tickers = []
+    with open("tickers.txt", "r") as file:
+        for line in file:
+            i = line.index("|")
+            tick = line[:i]
+            tickers.append(tick)
+    return tickers
 
-# print(gt.get_tickers(NYSE=True, NASDAQ=False, AMEX=False))
-gt.save_tickers(NYSE=True, NASDAQ=True, AMEX=True, filename='tickers.csv')
+
+
+
